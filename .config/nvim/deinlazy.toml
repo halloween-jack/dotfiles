@@ -1,0 +1,99 @@
+[[plugins]]
+repo = 'Shougo/neomru.vim'
+
+[[plugins]]
+repo = 'Shougo/denite.nvim'
+depends = 'neomru.vim'
+hook_post_source = 'source ~/.config/nvim/plugins/denite.rc.vim'
+hook_add = '''
+  nnoremap [denite] <Nop>
+  nmap ,d [denite]
+  nnoremap <silent> [denite]d :<C-u>Denite file_rec<CR>
+  nnoremap <silent> [denite]f :<C-u>DeniteBuffer file_rec<CR>
+  nnoremap <silent> [denite]b :<C-u>Denite buffer<CR>
+  nnoremap <silent> [denite]m :<C-u>Denite file_mru<CR>
+  nnoremap <silent> [denite]` :<C-u>Denite -path=~/.config/nvim/ file_rec<CR>
+  nnoremap <silent> [denite]ft :<C-u>Denite filetype<CR>
+  nnoremap <silent> [denite]* :<C-u>DeniteCursorWord -buffer-name=search -mode=normal line<CR>
+  nnoremap <silent> [denite]. :<C-u>Denite -resume<CR>
+  nnoremap <silent> [denite]/ :<C-u>Denite grep<CR>
+'''
+
+[[plugins]]
+repo = '5t111111/denite-rails'
+depends = 'denite.nvim'
+
+[[plugins]]
+repo = 'Shougo/deoplete.nvim'
+on_i = 1
+hook_source = '''
+  let g:deoplete#enable_at_startup = 1
+  call deoplete#custom#source('LanguageClient',
+            \ 'min_pattern_length',
+            \ 2)
+  call deoplete#custom#var('omni', 'input_patterns', {
+      \ 'ruby': ['[^. *\t]\.\w*', '[a-zA-Z_]\w*::'],
+  \})
+  inoremap <expr><tab> pumvisible() ? "\<C-n>" :
+    \ neosnippet#expandable_or_jumpable() ?
+    \    "\<Plug>(neosnippet_expand_or_jump)" : "\<tab>"
+'''
+
+[[plugins]]
+repo = 'zchee/deoplete-jedi'
+on_ft = 'python'
+
+[[plugins]]
+repo = 'zchee/deoplete-go'
+on_ft = 'go'
+
+[[plugins]]
+repo = 'fatih/vim-go'
+on_ft = 'go'
+
+[[plugins]]
+repo = 'sebastianmarkow/deoplete-rust'
+on_ft = 'rust'
+hook_source = '''
+  let g:deoplete#sources#rust#racer_binary='~/.cargo/bin/racer'
+  let g:deoplete#sources#rust#rust_source_path='~/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/src'
+  let g:deoplete#sources#rust#show_duplicates=1
+  let g:deoplete#sources#rust#disable_keymap=1
+'''
+
+[[plugins]]
+repo = 'Shougo/neosnippet.vim'
+on_i = 1
+on_ft = 'snippet'
+depends = 'neosnippet-snippets'
+hook_source = '''
+  " Plugin key-mappings.
+  " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+  imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+  smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+  xmap <C-k>     <Plug>(neosnippet_expand_target)
+
+  " SuperTab like snippets behavior.
+  " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+  imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+  "imap <expr><TAB>
+  " \ pumvisible() ? "\<C-n>" :
+  " \ neosnippet#expandable_or_jumpable() ?
+  " \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+  smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+  \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+
+  " For conceal markers.
+  if has('conceal')
+    set conceallevel=2 concealcursor=niv
+  endif
+
+  let g:neosnippet#snippets_directory='~/.config/nvim/snippets'
+  let g:neosnippet#enable_snipmate_compatibility = 1
+  let g:neosnippet#enable_completed_snippet = 1
+  let g:neosnippet#expand_word_boundary = 1
+'''
+
+[[plugins]]
+repo = 'Quramy/tsuquyomi'
+on_ft = ['typescript']
