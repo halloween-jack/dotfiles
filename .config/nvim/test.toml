@@ -1,8 +1,0 @@
-[[plugins]]
-repo = 'w0rp/ale'
-hook_add = '''
-  let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
-  nmap <silent> <C-a>j <Plug>(ale_next_wrap)
-  nmap <silent> <C-a>k <Plug>(ale_previous_wrap)
-'''
-
