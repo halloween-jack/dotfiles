@@ -27,10 +27,10 @@ background = "#000000"
 foreground = "#ffffff"
 
 [font]
-size = 14.0
+size = 18.0
 
 [font.normal]
-family = "HackGenConsoleNF"
+family = "HackGen Console NF"
 
 [window]
 opacity = 0.8

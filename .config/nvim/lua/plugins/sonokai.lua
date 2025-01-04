@@ -1,23 +1,23 @@
 return {
-	"sainnhe/sonokai",
-	lazy = false,
-	priority = 1000,
-	init = function()
-		vim.o.termguicolors = true
+    "sainnhe/sonokai",
+    lazy = false,
+    priority = 1000,
+    init = function()
+        vim.o.termguicolors = true
 
-		vim.g.sonokai_enable_italic = 1
-		vim.g.sonokai_disable_italic_comment = 1
-		vim.g.sonokai_transparent_background = 1
+        vim.g.sonokai_enable_italic = 1
+        vim.g.sonokai_disable_italic_comment = 1
+        vim.g.sonokai_transparent_background = 1
 
-		vim.g.sonokai_dim_inactive_windows = 1
+        vim.g.sonokai_dim_inactive_windows = 1
 
-		vim.g.sonokai_diagnostic_text_highlight = 1
-		vim.g.sonokai_diagnostic_virtual_text = "colored"
-		vim.g.sonokai_better_performance = 1
-	end,
-	config = function()
-		-- TODO: lua化
-		vim.cmd([[
+        vim.g.sonokai_diagnostic_text_highlight = 1
+        vim.g.sonokai_diagnostic_virtual_text = "colored"
+        vim.g.sonokai_better_performance = 1
+    end,
+    config = function()
+        -- TODO: lua化
+        vim.cmd([[
 function! s:sonokai_custom() abort
     " lspsagaのversion0.2.3からhighlight
     " group名が変更になったためsonokaiで定義されているカラーと手動でリンクさせる
@@ -91,6 +91,6 @@ augroup SonokaiCustom
 augroup END
         ]])
 
-		vim.cmd("colorscheme sonokai")
-	end,
+        vim.cmd("colorscheme sonokai")
+    end,
 }
