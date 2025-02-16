@@ -2,5 +2,6 @@ theme = Wombat
 background-opacity = 0.85
 font-family = "HackGen Console NF"
 font-size = 16
+macos-icon = xray
 
 keybind = ctrl+d=quit

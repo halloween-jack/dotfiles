@@ -142,6 +142,7 @@ return {
                 "ts_ls",
                 "gopls",
                 "lua_ls",
+                "phpactor",
             },
         })
         mason_lspconfig.setup_handlers({

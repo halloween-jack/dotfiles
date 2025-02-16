@@ -22,9 +22,9 @@ return {
         -- See the full "keymap" documentation for information on defining your own keymap.
         keymap = {
             preset = 'enter',
-            cmdline = {
-                preset = 'default',
-            }
+        },
+        cmdline = {
+            enabled = false
         },
 
         appearance = {
@@ -38,21 +38,13 @@ return {
         },
 
         snippets = {
-            expand = function(snippet) require('luasnip').lsp_expand(snippet) end,
-            active = function(filter)
-                if filter and filter.direction then
-                    return require('luasnip').jumpable(filter.direction)
-                end
-                return require('luasnip').in_snippet()
-            end,
-            jump = function(direction) require('luasnip').jump(direction) end,
+            preset = 'luasnip'
         },
 
         -- Default list of enabled providers defined so that you can extend it
         -- elsewhere in your config, without redefining it, due to `opts_extend`
         sources = {
-            default = { 'lsp', 'path', 'luasnip', 'snippets', 'buffer' },
-            cmdline = {},
+            default = { 'lsp', 'path', 'snippets', 'buffer' },
         },
         completion = {
             documentation = {
@@ -65,6 +57,9 @@ return {
             menu = {
                 enabled = true,
                 border = 'single'
+            },
+            ghost_text = {
+                enabled = true
             }
         },
         signature = {
