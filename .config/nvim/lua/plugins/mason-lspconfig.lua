@@ -16,8 +16,6 @@ return {
                 end
             end,
         },
-        -- replace from nvim-cmp to blink.cmp
-        -- "hrsh7th/cmp-nvim-lsp",
     },
     config = function()
         local on_attach = function(client, bufnr)
@@ -99,31 +97,8 @@ return {
                     desc = "Clear All the References",
                 })
             end
-
-            -- support inlay hint
-            if client.server_capabilities.inlayHintProvider then
-                vim.lsp.inlay_hint.enable(true, {
-                    bufnr,
-                })
-            end
         end
 
-        -- config that activates keymaps and enables snippet support
-        local function make_config()
-            local capabilities = vim.lsp.protocol.make_client_capabilities()
-            -- e.g https://github.com/hrsh7th/cmp-nvim-lsp/blob/main/lua/cmp_nvim_lsp/init.lua
-            -- documentationFormat以外の設定cmp_nvim_lspによって設定されるため設定しなくて良いかも
-            capabilities.textDocument.completion.completionItem.documentationFormat = { "markdown" }
-
-            -- capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
-
-            capabilities = require('blink.cmp').get_lsp_capabilities()
-
-            return {
-                capabilities = capabilities,
-                on_attach = on_attach,
-            }
-        end
         require("mason").setup({
             ui = {
                 border = "single",
@@ -134,162 +109,143 @@ return {
                 coc = false,
             },
         })
-        local mason_lspconfig = require("mason-lspconfig")
-        local config = make_config()
-        mason_lspconfig.setup({
-            ensure_installed = {
-                "rust_analyzer",
-                "ts_ls",
-                "gopls",
-                "lua_ls",
-                "phpactor",
+
+        local ensure_installed = {
+            "rust_analyzer",
+            "ts_ls",
+            "clangd",
+            "gopls",
+            "lua_ls",
+            --"ruby_lsp",
+            "phpactor",
+        }
+        require("mason-lspconfig").setup({
+            ensure_installed = ensure_installed,
+        })
+
+        -- neovim 0.11 LSP settings
+        vim.diagnostic.config({
+            virtual_lines = true,
+        })
+
+        vim.lsp.config('*', {
+            on_attach = on_attach
+        })
+
+        vim.lsp.config.rust_analyzer = {
+            on_attach = on_attach, -- FIXME: `vim.lsp.config('*')`での設定が何故か有効にならないため明示的に設定する
+            settings = {
+                ["rust-analyzer"] = {
+                    checkOnSave = {
+                        command = "clippy",
+                    },
+                    completion = {
+                        fullFunctionSignatures = {
+                            enable = true,
+                        },
+                    },
+                },
+            }
+        }
+
+        vim.lsp.config.ts_ls = {
+            settings = {
+                typescript = {
+                    inlayHints = {
+                        includeInlayEnumMemberValueHints = true,
+                        includeInlayFunctionLikeReturnTypeHints = false,
+                        includeInlayFunctionParameterTypeHints = false,
+                        includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+                        includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                        includeInlayPropertyDeclarationTypeHints = true,
+                        includeInlayVariableTypeHints = true,
+                    },
+                },
+                javascript = {
+                    inlayHints = {
+                        includeInlayEnumMemberValueHints = true,
+                        includeInlayFunctionLikeReturnTypeHints = false,
+                        includeInlayFunctionParameterTypeHints = false,
+                        includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+                        includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                        includeInlayPropertyDeclarationTypeHints = true,
+                        includeInlayVariableTypeHints = true,
+                    },
+                },
             },
-        })
-        mason_lspconfig.setup_handlers({
-            function(server_name)
-                require("lspconfig")[server_name].setup({
-                    on_attach = config.on_attach,
-                    capabilities = config.capabilities,
-                })
-            end,
-            ["rust_analyzer"] = function()
-                require("lspconfig").rust_analyzer.setup({
-                    on_attach = config.on_attach,
-                    capabilities = config.capabilities,
-                    settings = {
-                        ["rust-analyzer"] = {
-                            checkOnSave = {
-                                command = "clippy",
-                            },
-                            completion = {
-                                fullFunctionSignatures = {
-                                    enable = true,
-                                },
-                            },
-                        },
+        }
+
+        vim.lsp.config.clangd = {
+            capabilities = {
+                offsetEncoding = "utf-8"
+            }
+        }
+
+        vim.lsp.config.lua_ls = {
+            settings = {
+                Lua = {
+                    diagnostics = {
+                        -- Get the language server to recognize the `vim` global
+                        globals = { "vim" },
                     },
-                })
-            end,
-            ["ts_ls"] = function()
-                require("lspconfig").ts_ls.setup({
-                    on_attach = config.on_attach,
-                    capabilities = config.capabilities,
-                    settings = {
-                        typescript = {
-                            inlayHints = {
-                                includeInlayEnumMemberValueHints = true,
-                                includeInlayFunctionLikeReturnTypeHints = false,
-                                includeInlayFunctionParameterTypeHints = false,
-                                includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
-                                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                                includeInlayPropertyDeclarationTypeHints = true,
-                                includeInlayVariableTypeHints = true,
-                            },
-                        },
-                        javascript = {
-                            inlayHints = {
-                                includeInlayEnumMemberValueHints = true,
-                                includeInlayFunctionLikeReturnTypeHints = false,
-                                includeInlayFunctionParameterTypeHints = false,
-                                includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
-                                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                                includeInlayPropertyDeclarationTypeHints = true,
-                                includeInlayVariableTypeHints = true,
-                            },
-                        },
+                    workspace = {
+                        -- Make the server aware of Neovim runtime files
+                        library = vim.api.nvim_get_runtime_file("", true),
                     },
-                })
-            end,
-            ["denols"] = function()
-                require("lspconfig").denols.setup({
-                    on_attach = config.on_attach,
-                    capabilities = config.capabilities,
-                    root_dir = require("lspconfig").util.root_pattern("deno.json", "deno.jsonc"),
-                })
-            end,
-            ["clangd"] = function()
-                local custom_config = make_config()
-                custom_config.capabilities.offsetEncoding = "utf-8"
-                require("lspconfig").clangd.setup({
-                    on_attach = custom_config.on_attach,
-                    capabilities = custom_config.capabilities,
-                })
-            end,
-            ["lua_ls"] = function()
-                require("lspconfig").lua_ls.setup({
-                    on_attach = config.on_attach,
-                    capabilities = config.capabilities,
-                    settings = {
-                        Lua = {
-                            diagnostics = {
-                                -- Get the language server to recognize the `vim` global
-                                globals = { "vim" },
-                            },
-                            workspace = {
-                                -- Make the server aware of Neovim runtime files
-                                library = vim.api.nvim_get_runtime_file("", true),
-                            },
-                        },
+                },
+            },
+        }
+
+        vim.lsp.config.gopls = {
+
+            settings = {
+                gopls = {
+                    hints = {
+                        assignVariableTypes = true,
+                        compositeLiteralFields = true,
+                        compositeLiteralTypes = true,
+                        constantValues = true,
+                        functionTypeParameters = true,
+                        parameterNames = true,
+                        rangeVariableTypes = true,
                     },
-                })
-            end,
-            ["gopls"] = function()
-                require("lspconfig").gopls.setup({
-                    on_attach = config.on_attach,
-                    capabilities = config.capabilities,
-                    settings = {
-                        gopls = {
-                            hints = {
-                                assignVariableTypes = true,
-                                compositeLiteralFields = true,
-                                compositeLiteralTypes = true,
-                                constantValues = true,
-                                functionTypeParameters = true,
-                                parameterNames = true,
-                                rangeVariableTypes = true,
-                            },
-                        },
-                    },
-                })
-            end,
-            ["ruby_lsp"] = function()
-                require("lspconfig").ruby_lsp.setup({
-                    on_attach = config.on_attach,
-                    capabilities = config.capabilities,
-                    init_options = {
-                        enabledFeatures = {
-                            "documentSymbol",
-                            "documentLink",
-                            "hover",
-                            "foldingRanges",
-                            "selectionRanges",
-                            "semanticHighlighting",
-                            "signatureHelp",
-                            "formatting",
-                            "onTypeFormatting",
-                            "diagnostics",
-                            "codeActions",
-                            "codeActionResolve",
-                            "documentHighlight",
-                            "inlayHints",
-                            "completion",
-                            "codeLens",
-                        },
-                        experimentalFeaturesEnabled = true,
-                    },
-                })
-            end,
-            -- ["phpactor"] = function()
-            -- 	require("lspconfig").phpactor.setup({
-            -- 		on_attach = config.on_attach,
-            -- 		capabilities = config.capabilities,
-            -- 		init_options = {
-            -- 			["language_server_phpstan.enabled"] = true,
-            -- 			["language_server_phpstan.bin"] = "~/.local/share/nvim/mason/bin/phpstan",
-            -- 			["language_server_phpstan.level"] = 9,
-            -- 		},
-            -- 	})
-            -- end,
-        })
+                },
+            },
+        }
+
+        vim.lsp.config.ruby_lsp = {
+            init_options = {
+                enabledFeatures = {
+                    "documentSymbol",
+                    "documentLink",
+                    "hover",
+                    "foldingRanges",
+                    "selectionRanges",
+                    "semanticHighlighting",
+                    "signatureHelp",
+                    "formatting",
+                    "onTypeFormatting",
+                    "diagnostics",
+                    "codeActions",
+                    "codeActionResolve",
+                    "documentHighlight",
+                    "inlayHints",
+                    "completion",
+                    "codeLens",
+                },
+                experimentalFeaturesEnabled = true,
+            },
+        }
+
+        -- vim.lsp.config.phpactor = {
+        --     init_options = {
+        --         ["language_server_phpstan.enabled"] = true,
+        --         ["language_server_phpstan.bin"] = "~/.local/share/nvim/mason/bin/phpstan",
+        --         ["language_server_phpstan.level"] = 9,
+        --     },
+        -- }
+
+        vim.lsp.enable(ensure_installed)
+        vim.lsp.inlay_hint.enable(true)
     end,
 }
