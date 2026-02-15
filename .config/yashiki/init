@@ -1,0 +1,79 @@
+#!/bin/sh
+
+# Extend PATH for custom layout engines
+yashiki add-exec-path /opt/homebrew/bin
+
+# Layout configuration
+yashiki layout-set-default tatami
+yashiki set-outer-gap 2
+yashiki layout-cmd --layout tatami set-inner-gap 2
+yashiki layout-cmd --layout byobu set-padding 40
+yashiki layout-cmd --layout byobu set-orientation v
+
+# Cursor warp
+yashiki set-cursor-warp on-focus-change
+
+# Auto-raise (focus follows mouse)
+yashiki set-auto-raise enabled --delay 100
+
+# Tags (all 9 tags)
+for i in 1 2 3 4 5 6 7 8 9; do
+  yashiki bind "alt-$i" tag-view "$((1<<(i-1)))"
+  yashiki bind "alt-shift-$i" window-move-to-tag "$((1<<(i-1)))"
+  yashiki bind "alt-ctrl-$i" window-toggle-tag "$((1<<(i-1)))"
+done
+yashiki bind alt-0 tag-view-last
+yashiki bind alt-tab tag-view-last
+
+# Window focus (vim + directional)
+yashiki bind alt-j window-focus down
+yashiki bind alt-k window-focus up
+yashiki bind alt-h window-focus left
+yashiki bind alt-l window-focus right
+yashiki bind alt-shift-j window-swap down
+yashiki bind alt-shift-k window-swap up
+yashiki bind alt-shift-h window-swap left
+yashiki bind alt-shift-l window-swap right
+
+yashiki bind alt-s layout-set byobu
+yashiki bind alt-e layout-set tatami
+
+# Layout controls
+yashiki bind alt-comma layout-cmd inc-main-count
+yashiki bind alt-period layout-cmd dec-main-count
+yashiki bind alt-z layout-cmd zoom
+yashiki bind alt-i layout-cmd inc-inner-gap
+yashiki bind alt-shift-i layout-cmd dec-inner-gap
+
+# Window management
+yashiki bind alt-f window-toggle-fullscreen
+yashiki bind alt-shift-f window-toggle-float
+yashiki bind alt-shift-c window-close
+# yashiki bind alt-return retile
+
+# Multi-monitor
+yashiki bind alt-o output-focus next
+yashiki bind alt-shift-o output-send next
+
+# App launchers
+yashiki bind alt-return exec "open -n /Applications/Ghostty.app"
+
+# Companion tools (terminated on yashiki quit)
+yashiki exec --track "borders active_color=0xfffac61e"
+
+# Window rules - Float dialogs and utilities
+yashiki rule-add --app-name "System Settings" float
+yashiki rule-add --app-name "System Preferences" float
+yashiki rule-add --subrole Dialog float
+yashiki rule-add --subrole FloatingWindow float
+yashiki rule-add --fullscreen-button none float
+
+# Window rules - Ignore popups (prevents flickering)
+yashiki rule-add --subrole AXUnknown ignore
+yashiki rule-add --close-button none ignore
+
+# Window rules - App-specific
+yashiki rule-add --app-id org.mozilla.firefox --subrole AXUnknown ignore  # Firefox popups
+
+# Ghostty Quick Terminal
+yashiki rule-add --app-id com.mitchellh.ghostty --fullscreen-button disabled ignore
