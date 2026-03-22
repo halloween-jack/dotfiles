@@ -20,7 +20,7 @@ yashiki set-auto-raise enabled --delay 100
 for i in 1 2 3 4 5 6 7 8 9; do
   yashiki bind "alt-$i" tag-view "$((1<<(i-1)))"
   yashiki bind "alt-shift-$i" window-move-to-tag "$((1<<(i-1)))"
-  yashiki bind "alt-ctrl-$i" window-toggle-tag "$((1<<(i-1)))"
+  yashiki bind "alt-ctrl-$i" tag-toggle "$((1<<(i-1)))"
 done
 yashiki bind alt-0 tag-view-last
 yashiki bind alt-tab tag-view-last
